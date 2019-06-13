@@ -8,9 +8,19 @@
                 Entry Priority: {{ entry.priority }}
             </td>
             <td class="align-middle">
-                <button type="button" class="btn btn-success btn-sm">Good</button>
-                <button type="button" class="btn btn-secondary btn-sm">Okay</button>
-                <button type="button" class="btn btn-danger btn-sm">Review</button>
+                <!-- The posts are accessed by name:value key as a hashmap -->
+                <!-- We want the button to send the id of the entry -->
+                <form action="/" method="post">
+                    <button name = "green"
+                            value = {{ entry.id }}
+                            type="submit" class="btn btn-success btn-sm">Good</button>
+                    <button name = "grey"
+                            value = {{ entry.id }}
+                            type="submit" class="btn btn-secondary btn-sm">Okay</button>
+                    <button name = "red"
+                            value = {{ entry.id }}
+                            type="submit" class="btn btn-danger btn-sm">Review</button>
+                </form>
             </td>
         </tr>
     </table>

@@ -1,9 +1,17 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 
 app = Flask(__name__)
 
-@app.route('/')
+@app.route('/', methods=["GET", "POST"])
 def index():
+    if request.method == "POST":
+        request_dict = request.form.to_dict()
+        # Get the key value of the id, both values are strings
+        color = list(request_dict)[0]
+        id = int(request_dict[color])
+
+        print(id, color)
+
     # Create the homepage; basic tester
     # Mock Data
     d1 = dict(
