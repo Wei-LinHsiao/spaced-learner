@@ -1,25 +1,54 @@
 <!-- HTML for the appearance of a post -->
-<div class="offset-md-1 col-md-10 ">
+<div class="offset-md-1 col-md-10">
     <table class="table">
+        {% if entry.status == 1 %}
         <tr>
+        {% else %}
+        <tr>
+        {% endif %}
             <td width="70%" class="align-middle">
-                Entry ID: {{ entry.id }} <br>
-                Entry Text: {{ entry.text }} <br>
-                Entry Priority: {{ entry.priority }}
+                ID: {{ entry.e_id }} <br>
+                Priority: {{ entry.priority }} <br>
+                Entry Status: {{ entry.status }} <br>
+                Text: {{ entry.text }}
             </td>
             <td class="align-middle">
                 <!-- The posts are accessed by name:value key as a hashmap -->
                 <!-- We want the button to send the id of the entry -->
+                <!-- Control statements are for greying out button -->
                 <form action="/" method="post">
-                    <button name = "green"
-                            value = {{ entry.id }}
-                            type="submit" class="btn btn-success btn-sm">Good</button>
-                    <button name = "grey"
-                            value = {{ entry.id }}
-                            type="submit" class="btn btn-secondary btn-sm">Okay</button>
+                    {% if entry.status != 2%}
                     <button name = "red"
-                            value = {{ entry.id }}
+                            value = {{ entry.e_id }}
+                            type="submit" class="btn btn-outline-danger btn-sm">Review</button>
+                    {% else %}
+                    <button name = "red"
+                            value = {{ entry.e_id }}
                             type="submit" class="btn btn-danger btn-sm">Review</button>
+                    {% endif %}
+
+                    {% if entry.status != 3%}
+                    <button name = "grey"
+                            value = {{ entry.e_id }}
+                            type="submit" class="btn btn-outline-secondary btn-sm">Okay</button>
+                    {% else %}
+                    <button name = "grey"
+                            value = {{ entry.e_id }}
+                            type="submit"
+                            class="btn btn-secondary btn-sm"
+                            data-toggle="button">Okay</button>
+                    {% endif %}
+
+                    {% if entry.status != 4%}
+                    <button name = "green"
+                            value = {{ entry.e_id }}
+                            type="submit" class="btn btn-outline-success btn-sm">Good</button>
+                    {% else %}
+                    <button name = "green"
+                            value = {{ entry.e_id }}
+                            type="submit"
+                            class="btn btn-success btn-sm">Good</button>
+                    {% endif %}
                 </form>
             </td>
         </tr>

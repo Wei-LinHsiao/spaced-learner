@@ -11,9 +11,25 @@
 
 </head>
 <body class = "container-fluid">
-    <h1>Learner Mockup - V1</h1>
+    <h1>Learner Mockup - V2</h1>
     {% for entry in entries %}
         {% include '_entry.html' %}
     {% endfor %}
+
+    <!-- End submission button -->
+    <div class="offset-md-1 col-md-10 text-center">
+        <table class="table">
+            <tr class="align-middle">
+                <td class="align-middle">
+                    <form action="/" method="post">
+                        <button name = "submit"
+                                value = "submit"
+                                type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+                </td>
+            </tr>
+        </table>
+    </div>
+
 </body>
 </html>
