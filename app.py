@@ -2,19 +2,18 @@ from flask import Flask, render_template, request
 
 app = Flask(__name__)
 
-# Global variables
+# Global variables.
 all_entries = []
 current_entries = []
 entry_num = 0
 debug = True
 
-# Mock db of all entires; list for now
+# Mock db of all entires; list for now.
 if debug:
     ## Generate the webpage
     ## DB Schema:
     # u_id - user id
     # e_id - entry id
-    # color - color of selected note
     # text - text of entry
     # priority - importance (top five selected on first generation)
     # status - integer from 0 to 4
@@ -29,7 +28,6 @@ if debug:
     d1 = dict(
         u_id=0,
         e_id=0,
-        color="blue",
         text="Apples",
         priority=1,
         status=0,
@@ -39,7 +37,6 @@ if debug:
     d2 = dict(
         u_id=0,
         e_id=1,
-        color="",
         text="Oranges",
         priority=1,
         status=0,
@@ -49,7 +46,6 @@ if debug:
     d3 = dict(
         u_id=0,
         e_id=2,
-        color="blue",
         text="Pears",
         priority=1,
         status=0,
@@ -59,7 +55,6 @@ if debug:
     d4 = dict(
         u_id=0,
         e_id=3,
-        color="blue",
         text="Mangoes",
         priority=1,
         status=0,
@@ -69,7 +64,6 @@ if debug:
     d5 = dict(
         u_id=0,
         e_id=4,
-        color="blue",
         text="Blueberries",
         priority=1,
         status=0,
@@ -78,6 +72,7 @@ if debug:
 
     all_entries = [d1, d2, d3, d4, d5]
 
+# Updates all entries, given the status of their info.
 def start_day():
     ## This code is at the start of a "day"; sort and figure things out
     # Look at current_entries and modify the status of all_entries by status
@@ -100,7 +95,6 @@ def start_day():
     # Sort entires by priority before rendering
     all_entries.sort(key=lambda x: x["priority"])
 
-
     # Clear current entries, and get the top three overall entries
     # Need to check for case where < 3 entries
     # Change their statuses to 1 to indicate usage
@@ -110,6 +104,13 @@ def start_day():
     for i in range(0, 3):
         current_entries[i]["status"] = 1
 
+# General Functions
+
+## Route Functions: API endpoints.
+@app.route('/entry/tes', methods=["GET", "POST"])
+
+
+## Route Functions: Render main pages.
 @app.route('/tester', methods=["GET", "POST"])
 @app.route('/', methods=["GET", "POST"])
 def tester():

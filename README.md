@@ -17,6 +17,7 @@ Milestone Two: Get basic app working for multiple user
  - Create login page/ navbar
  - Create new feature; "Decks" of cards, with importing and exporting features
  - Create homepage to access decks
+ - Implement actual day cycle
  - Begin deploying online
 Milestone Three: Facelift
  - No specifics, but reform interface frontend
