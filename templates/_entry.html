@@ -7,50 +7,179 @@
         <tr>
         {% endif %}
             <td width="70%" class="align-middle">
-                ID: {{ entry.e_id }} <br>
-                Priority: {{ entry.priority }} <br>
-                Entry Status: {{ entry.status }} <br>
-                Text: {{ entry.text }}
+                <br>
+                {{ entry.text }}
             </td>
             <td class="align-middle">
                 <!-- The posts are accessed by name:value key as a hashmap -->
                 <!-- We want the button to send the id of the entry -->
                 <!-- Control statements are for greying out button -->
-                <form action="/" method="post">
-                    {% if entry.status != 2%}
-                    <button name = "red"
-                            value = {{ entry.e_id }}
-                            type="submit" class="btn btn-outline-danger btn-sm">Review</button>
-                    {% else %}
-                    <button name = "red"
-                            value = {{ entry.e_id }}
-                            type="submit" class="btn btn-danger btn-sm">Review</button>
-                    {% endif %}
+                {% if entry.status != 2%}
+                <button type = "button"
+                        id = {{ "red_" ~ entry.e_id|string}}
+                        name = "red"
+                        value = {{ entry.e_id }}
+                        class="btn btn-outline-danger btn-sm">Review</button>
+                {% else %}
+                <button type = "button"
+                        id = {{ "red_" ~ entry.e_id|string}}
+                        name = "red"
+                        value = {{ entry.e_id }}
+                        class="btn btn-danger btn-sm">Review</button>
+                {% endif %}
 
-                    {% if entry.status != 3%}
-                    <button name = "grey"
-                            value = {{ entry.e_id }}
-                            type="submit" class="btn btn-outline-secondary btn-sm">Okay</button>
-                    {% else %}
-                    <button name = "grey"
-                            value = {{ entry.e_id }}
-                            type="submit"
-                            class="btn btn-secondary btn-sm"
-                            data-toggle="button">Okay</button>
-                    {% endif %}
+                {% if entry.status != 3%}
+                <button type = "button"
+                        id = {{ "grey_" ~ entry.e_id|string}}
+                        name = "grey"
+                        value = {{ entry.e_id }}
+                        class="btn btn-outline-secondary btn-sm">Okay</button>
+                {% else %}
+                <button type = "button"
+                        id = {{ "grey_" ~ entry.e_id|string}}
+                        name = "grey"
+                        value = {{ entry.e_id }}
+                        class="btn btn-secondary btn-sm">Okay</button>
+                {% endif %}
 
-                    {% if entry.status != 4%}
-                    <button name = "green"
-                            value = {{ entry.e_id }}
-                            type="submit" class="btn btn-outline-success btn-sm">Good</button>
-                    {% else %}
-                    <button name = "green"
-                            value = {{ entry.e_id }}
-                            type="submit"
-                            class="btn btn-success btn-sm">Good</button>
-                    {% endif %}
-                </form>
+                {% if entry.status != 4%}
+                <button type = "button"
+                        id = {{ "green_" ~ entry.e_id|string }}
+                        name = "green"
+                        value = {{ entry.e_id }}
+                        class="btn btn-outline-success btn-sm">Good</button>
+                {% else %}
+                <button type = "button"
+                        id = {{ "green_" ~ entry.e_id|string}}
+                        name = "green"
+                        value = {{ entry.e_id }}
+                        class="btn btn-success btn-sm">Good</button>
+                {% endif %}
+
             </td>
         </tr>
     </table>
 </div>
+
+<script type="text/javascript">
+    // Initiate variables for buttons.
+    var {{ "red_" ~ entry.e_id|string}} = document.getElementById("{{ "red_" ~ entry.e_id|string}}");
+    var {{ "grey_" ~ entry.e_id|string}} = document.getElementById("{{ "grey_" ~ entry.e_id|string}}");
+    var {{ "green_" ~ entry.e_id|string}} = document.getElementById("{{ "green_" ~ entry.e_id|string}}");
+
+    // Onclick functions for each color.
+    {{ "red_" ~ entry.e_id|string}}.onclick = function () {
+        // This can be compressed into a singular function within texter.
+        // Get the eid.
+        var e_id = {{ "red_" ~ entry.e_id|string}}.value
+        var color = {{ "red_" ~ entry.e_id|string}}.name
+        // Create a json object for returning data.
+        var return_data = new Object();
+        return_data.e_id = e_id
+        return_data.color = color
+
+        // Post to set status (we could move logic to frontend).
+        $.ajax({
+            method: 'POST',
+            url: "tester",
+            dataType: "json",
+            contentType: "application/json",
+            data: JSON.stringify(return_data),
+            success: function () {
+                console.log("Successly sent data!");
+            },
+            error: function () {
+                console.log("Unsuccessfully sent info!");
+            }
+        });
+
+        // Set the other two to outlines
+        {{ "grey_" ~ entry.e_id|string}}.classList.remove("btn-secondary");
+        {{ "green_" ~ entry.e_id|string}}.classList.remove("btn-success");
+        {{ "grey_" ~ entry.e_id|string}}.classList.add("btn-outline-secondary");
+        {{ "green_" ~ entry.e_id|string}}.classList.add("btn-outline-success");
+
+        // If unclicked, set other two to clicked, and self to clicked.
+        // Clicked means button is filled; contians not outline.
+        if ({{ "red_" ~ entry.e_id|string}}.classList.contains("btn-outline-danger")) {
+            {{ "red_" ~ entry.e_id|string}}.classList.remove("btn-outline-danger");
+            {{ "red_" ~ entry.e_id|string}}.classList.add("btn-danger");
+        } else {
+            // If clicked, set to unclicked.
+            {{ "red_" ~ entry.e_id|string}}.classList.remove("btn-danger");
+            {{ "red_" ~ entry.e_id|string}}.classList.add("btn-outline-danger");
+        }
+    }
+
+    {{ "grey_" ~ entry.e_id|string}}.onclick = function () {
+        var e_id = {{ "grey_" ~ entry.e_id|string}}.value
+        var color = {{ "grey_" ~ entry.e_id|string}}.name
+        var return_data = new Object();
+        return_data.e_id = e_id
+        return_data.color = color
+
+        $.ajax({
+            method: 'POST',
+            url: "tester",
+            dataType: "json",
+            contentType: "application/json",
+            data: JSON.stringify(return_data),
+            success: function () {
+                console.log("Successly sent data!");
+            },
+            error: function () {
+                console.log("Unsuccessfully sent info!");
+            }
+        });
+
+        {{ "red_" ~ entry.e_id|string}}.classList.remove("btn-danger");
+        {{ "green_" ~ entry.e_id|string}}.classList.remove("btn-success");
+        {{ "red_" ~ entry.e_id|string}}.classList.add("btn-outline-danger");
+        {{ "green_" ~ entry.e_id|string}}.classList.add("btn-outline-success");
+
+        if ({{ "grey_" ~ entry.e_id|string}}.classList.contains("btn-outline-secondary"))
+        {
+            {{ "grey_" ~ entry.e_id|string}}.classList.remove("btn-outline-secondary");
+            {{ "grey_" ~ entry.e_id|string}}.classList.add("btn-secondary");
+        } else {
+            {{ "grey_" ~ entry.e_id|string}}.classList.remove("btn-secondary");
+            {{ "grey_" ~ entry.e_id|string}}.classList.add("btn-outline-secondary");
+        }
+    }
+
+    {{ "green_" ~ entry.e_id|string}}.onclick = function () {
+        var e_id = {{ "green_" ~ entry.e_id|string}}.value
+        var color = {{ "green_" ~ entry.e_id|string}}.name
+        var return_data = new Object();
+        return_data.e_id = e_id
+        return_data.color = color
+
+        $.ajax({
+            method: 'POST',
+            url: "tester",
+            dataType: "json",
+            contentType: "application/json",
+            data: JSON.stringify(return_data),
+            success: function () {
+                console.log("Successly sent data!");
+            },
+            error: function () {
+                console.log("Unsuccessfully sent info!");
+            }
+        });
+
+        {{ "red_" ~ entry.e_id|string}}.classList.remove("btn-danger");
+        {{ "grey_" ~ entry.e_id|string}}.classList.remove("btn-secondary");
+        {{ "red_" ~ entry.e_id|string}}.classList.add("btn-outline-danger");
+        {{ "grey_" ~ entry.e_id|string}}.classList.add("btn-outline-secondary");
+
+
+        if ({{ "green_" ~ entry.e_id|string}}.classList.contains("btn-outline-success")) {
+            {{ "green_" ~ entry.e_id|string}}.classList.remove("btn-outline-success");
+            {{ "green_" ~ entry.e_id|string}}.classList.add("btn-success");
+        } else {
+            {{ "green_" ~ entry.e_id|string}}.classList.remove("btn-success");
+            {{ "green_" ~ entry.e_id|string}}.classList.add("btn-outline-success");
+        }
+    }
+</script>

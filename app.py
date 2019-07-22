@@ -3,7 +3,13 @@ from flask import Flask, render_template, request
 app = Flask(__name__)
 
 # Global variables
-if True:
+all_entries = []
+current_entries = []
+entry_num = 0
+debug = True
+
+# Mock db of all entires; list for now
+if debug:
     ## Generate the webpage
     ## DB Schema:
     # u_id - user id
@@ -70,9 +76,7 @@ if True:
         time=0
     )
 
-    # Mock db of all entires; list for now
     all_entries = [d1, d2, d3, d4, d5]
-    current_entries = []
 
 def start_day():
     ## This code is at the start of a "day"; sort and figure things out
@@ -106,20 +110,17 @@ def start_day():
     for i in range(0, 3):
         current_entries[i]["status"] = 1
 
+@app.route('/tester', methods=["GET", "POST"])
 @app.route('/', methods=["GET", "POST"])
-def index():
+def tester():
     if request.method == "POST":
-        request_dict = request.form.to_dict()
-        # Get the key value of the id, both values are strings
-        color = list(request_dict)[0]
-
-        # Go on to next day and process if submit
-        if color == "submit":
+        # If is submit, next day and end.
+        if "submit" in request.form:
             start_day()
-        # Modify status based on button press
         else:
             # Get color, and modify accordingly
-            id = int(request_dict[color])
+            id = int(request.json["e_id"])
+            color = request.json["color"]
 
             # Change the priority of our current entry
             # Get id of current entry
@@ -146,7 +147,6 @@ def index():
                     current_entries[id_idx]["status"] = 4
                 else:
                     current_entries[id_idx]["status"] = 1
-
 
     return render_template('tester.html', entries = current_entries)
 
