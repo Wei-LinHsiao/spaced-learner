@@ -1,3 +1,5 @@
+import itertools
+
 # TODO: Add functions to change values in server.
 class Entry:
     def __init__(self, u_id, e_id, front_text, back_text, box_set = None):
@@ -42,6 +44,9 @@ class Box(object):
     def get_size(self):
         return len(self.box)
 
+    def get_all_entries(self):
+        return list(self.box.values())
+
     # Adds entry in box.
     def add_entry(self, entry):
         self.box[entry.e_id] = entry
@@ -64,7 +69,7 @@ class Level(object):
         self.level = level
         self.interval = interval
         # Initiate a number of boxes, relative to level value.
-        self.boxes = [Box(interval, i) for i in range(0, interval)]
+        self.boxes = [Box(self.level, i) for i in range(0, interval)]
         self.finished = False
 
     def __str__(self):
@@ -72,6 +77,13 @@ class Level(object):
         boxes_str = "\n  ".join(map(str, self.boxes))
 
         return("\n  ".join([level_str, boxes_str]))
+
+    def get_size(self):
+        return sum(list(map(lambda x: x.get_size(), self.boxes)))
+
+    # Returns an iterable (to avoid copying lists) of all entries.
+    def get_all_entries(self):
+        return itertools.product(map(lambda x: x.get_all_entries(), self.boxes))
 
     # Adds an entry to a box.
     def add_entry(self, box, entry):
@@ -98,8 +110,19 @@ class FinishedLevel(object):
         self.level = level
         self.interval = 0
         # Initiate a number of boxes, relative to level value.
-        self.boxes = [Box()]
+        self.boxes = [Box(5, 0)]
         self.finished = True
+
+    def __str__(self):
+        level_str = "Archive :"
+        boxes_str = "\n  ".join(map(str, self.boxes))
+        return("\n  ".join([level_str, boxes_str]))
+
+    def get_size(self):
+        return self.boxes[0].get_size()
+
+    def get_all_entries(self):
+        itertools.product(self.boxes)
 
     # Adds an entry to a box.
     def add_entry(self, box, entry):
@@ -134,7 +157,7 @@ class BoxSet(object):
             Level(2, 5),
             Level(3, 8),
             Level(4, 14),
-            FinishedLevel()
+            FinishedLevel(5)
         ]
 
         level_idx = 0
@@ -144,10 +167,18 @@ class BoxSet(object):
 
         self.num_levels = len(self.levels) - 1
 
+    def __str__(self):
+        deck_str = "Deck id " + str(self.box_id) + ":"
+        level_str = "\n  ".join(map(lambda x: str(x).replace("  ", "    "), self.levels))
+
+        return("\n  ".join([deck_str, level_str]))
+
     # Creates a new entry, and puts it in the first Leitner box
     def create_entry(self, front_text, back_text):
         new_entry = Entry(self.u_id, self.next_eid, front_text, back_text, self)
         self.next_eid += 1
+        self.add_entry(0, 0, new_entry)
+        return new_entry
 
     # Adds entry to a given level and box.
     def add_entry(self, level, box, entry):
@@ -172,7 +203,7 @@ class BoxSet(object):
         if entry.level == 0:
             # Move to next level in balanced fashion.
             self.levels[1].add_entry_balanced(entry)
-        elif entry.level in range(1, 3):
+        elif entry.level in range(1, 4):
             # Move to next level in unbalanced fashion.
             next_level = entry.level + 1
             next_box = self.cur_day % self.levels[next_level].interval
@@ -180,8 +211,14 @@ class BoxSet(object):
         elif entry.level == 4:
             # Move entry to finished box.
             self.levels[5].add_entry(0, entry)
+        elif entry.level == 5:
+            # Move entry to finished box.
+            raise AssertionError("Entry " + str(entry.e_id) + " is already archived.")
+        else:
+            raise AssertionError("Entry " + str(entry.e_id) + " has an invalid level.")
 
-        raise AssertionError("Entry " + entry.e_id + " has an invalid level.")
+    def get_size(self):
+        return sum(list(map(lambda x: x.get_size(), self.levels)))
 
     def get_all_cards(self):
         # Return all entries in all levels in an iterable.
