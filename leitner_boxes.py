@@ -1,6 +1,6 @@
 # TODO: Add functions to change values in server.
 class Entry:
-    def __init__(self, u_id, e_id, front_text, back_text):
+    def __init__(self, u_id, e_id, front_text, back_text, box_set = None):
         # All Entries have the following properties:
             # u_id - user id
             # e_id - entry id
@@ -17,6 +17,7 @@ class Entry:
         self.e_id = e_id
         self.front_text = front_text
         self.back_text = back_text
+        self.box_set = box_set
         self.status = 0
         self.level = 0
         self.box = 0
@@ -47,22 +48,23 @@ class Box(object):
         entry.box = self.num
         entry.level = self.level
 
-    # Removes entry, if it exists in box.
-    def remove_entry(self, e_id):
-        if e_id in self.box:
-            del self.box[e_id]
+    # Removes entry, by entry_id, if it exists in box.
+    def remove_entry(self, entry):
+        if entry.e_id in self.box:
+            del self.box[entry.e_id]
         else:
             # Throw error.
-            raise KeyError("No entry with e_id " + str(e_id) +
+            raise KeyError("No entry with e_id " + str(entry.e_id) +
                            " found in box " + str(self.num) +
                            " at level " + str(self.level))
 
 # One Leitner level.
 class Level(object):
-    def __init__(self, level):
+    def __init__(self, level, interval):
         self.level = level
+        self.interval = interval
         # Initiate a number of boxes, relative to level value.
-        self.boxes = [Box(level, i) for i in range(0, level)]
+        self.boxes = [Box(interval, i) for i in range(0, interval)]
         self.finished = False
 
     def __str__(self):
@@ -80,9 +82,9 @@ class Level(object):
         min_box = min(self.boxes, key = lambda x: x.get_size())
         min_box.add_entry(entry)
 
-    # Removes an entry in a certain box.
-    def remove_entry(self, box, e_id):
-        self.boxes[box].remove_entry(e_id)
+    # Removes an entry in a certain box with a given e_id.
+    def remove_entry(self, entry):
+        self.boxes[entry.box].remove_entry(entry)
 
     # If too unbalanced, rebalances boxes to be more even.
     # TODO: Implement
@@ -91,9 +93,10 @@ class Level(object):
 
 # A Leitner level representing the final level.
 class FinishedLevel(object):
-    def __init__(self):
+    def __init__(self, level):
         # None represents the last level.
-        self.level = None
+        self.level = level
+        self.interval = 0
         # Initiate a number of boxes, relative to level value.
         self.boxes = [Box()]
         self.finished = True
@@ -107,8 +110,8 @@ class FinishedLevel(object):
         self.add_entry(entry)
 
     # Removes an entry in a certain box.
-    def remove_entry(self, box, e_id):
-        self.boxes[0].remove_entry(e_id)
+    def remove_entry(self, entry):
+        self.boxes[entry.box].remove_entry(entry)
 
     # If too unbalanced, rebalances boxes to be more even.
     def rebalance(self):
@@ -119,21 +122,71 @@ class BoxSet(object):
     # Hardcode the progression; 1, 2, 5, 8, 14, NONE.
     def __init__(self, u_id):
         self.u_id = u_id
+        # TODO: Implement changing of BoxID with multiple decks.
+        self.box_id = 0
         self.cur_day = 0
         self.next_eid = 0
 
         # Initiate a number of boxes, relative to level value.
-        self.levels = []
-        self.levels.append(Level(1))
-        self.levels.append(Level(2))
-        self.levels.append(Level(5))
-        self.levels.append(Level(8))
-        self.levels.append(Level(14))
-        self.levels.append(FinishedLevel())
+        self.levels = [
+            Level(0, 1),
+            Level(1, 2),
+            Level(2, 5),
+            Level(3, 8),
+            Level(4, 14),
+            FinishedLevel()
+        ]
+
+        level_idx = 0
+        for level in self.levels:
+            level.leve_idx = level_idx
+            level_idx += 1
 
         self.num_levels = len(self.levels) - 1
 
     # Creates a new entry, and puts it in the first Leitner box
     def create_entry(self, front_text, back_text):
-        new_entry = Entry(self.u_id, self.next_eid, front_text, back_text)
+        new_entry = Entry(self.u_id, self.next_eid, front_text, back_text, self)
         self.next_eid += 1
+
+    # Adds entry to a given level and box.
+    def add_entry(self, level, box, entry):
+        self.levels[level].add_entry(box, entry)
+
+    # Adds entry to a given level in a balanced manner.
+    def add_entry_balanced(self, level, entry):
+        self.levels[level].add_entry_balanced(entry)
+
+    # Remove an entry from its level and box.
+    def remove_entry(self, entry):
+        self.levels[entry.level].remove_entry(entry)
+
+    def upgrade_entry(self, entry):
+        # If it is in 1, upgrade in a balanced fashion.
+        # If final level, throw error.
+        if entry.level == 5:
+            raise AssertionError("Entries that are at max level should not be updated!")
+        # Remove from current level.
+        self.remove_entry(entry)
+
+        if entry.level == 0:
+            # Move to next level in balanced fashion.
+            self.levels[1].add_entry_balanced(entry)
+        elif entry.level in range(1, 3):
+            # Move to next level in unbalanced fashion.
+            next_level = entry.level + 1
+            next_box = self.cur_day % self.levels[next_level].interval
+            self.levels[next_level].add_entry(next_box, entry)
+        elif entry.level == 4:
+            # Move entry to finished box.
+            self.levels[5].add_entry(0, entry)
+
+        raise AssertionError("Entry " + entry.e_id + " has an invalid level.")
+
+    def get_all_cards(self):
+        # Return all entries in all levels in an iterable.
+        return
+
+    def get_tested_cards(self):
+        # Get all cards tested in this day.
+        return

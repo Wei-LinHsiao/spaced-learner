@@ -21,8 +21,7 @@ class LeitnerBoxesCases(unittest.TestCase):
         self.entry_4 = leitner_boxes.Entry(0, 3, "", "")
 
         self.box = leitner_boxes.Box(0, 0)
-
-        self.level = leitner_boxes.Level(3)
+        self.level = leitner_boxes.Level(0, 3)
 
     def test_box_entry_add(self):
         self.box.add_entry(self.entry_1)
@@ -32,7 +31,7 @@ class LeitnerBoxesCases(unittest.TestCase):
     def test_box_entry_remove(self):
         self.box.add_entry(self.entry_1)
         self.box.add_entry(self.entry_2)
-        self.box.remove_entry(1)
+        self.box.remove_entry(self.entry_1)
         self.assertEqual(self.box.get_size(), 1, "Box is not of expected size")
 
     def test_level_addition(self):
@@ -57,7 +56,7 @@ class LeitnerBoxesCases(unittest.TestCase):
         self.assertTrue(boxes[0] == boxes[1] and
                         boxes[1] == boxes[2] and
                         boxes[0] == boxes[2], "Distribution is not even!")
-    
+
 
 if __name__ == '__main__':
     unittest.main()
