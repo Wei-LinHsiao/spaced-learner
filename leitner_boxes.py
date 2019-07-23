@@ -34,12 +34,18 @@ class Box(object):
         self.level = level
         self.num = num
 
+    # Tostring method: return the box number (but not level).
+    def __str__(self):
+        return "Box " + str(self.num) + " - " + str(list(self.box.keys()))
+
     def get_size(self):
         return len(self.box)
 
     # Adds entry in box.
     def add_entry(self, entry):
         self.box[entry.e_id] = entry
+        entry.box = self.num
+        entry.level = self.level
 
     # Removes entry, if it exists in box.
     def remove_entry(self, e_id):
@@ -56,8 +62,14 @@ class Level(object):
     def __init__(self, level):
         self.level = level
         # Initiate a number of boxes, relative to level value.
-        self.boxes = [Box() for i in range(0, level)]
+        self.boxes = [Box(level, i) for i in range(0, level)]
         self.finished = False
+
+    def __str__(self):
+        level_str = "Level " + str(self.level) + ":"
+        boxes_str = "\n  ".join(map(str, self.boxes))
+
+        return("\n  ".join([level_str, boxes_str]))
 
     # Adds an entry to a box.
     def add_entry(self, box, entry):
@@ -65,7 +77,7 @@ class Level(object):
 
     # Adds an entry to a level in a balanced manner.
     def add_entry_balanced(self, entry):
-        min_box = min(self.boxes, key = lambda x: x.get_size)
+        min_box = min(self.boxes, key = lambda x: x.get_size())
         min_box.add_entry(entry)
 
     # Removes an entry in a certain box.
@@ -73,7 +85,8 @@ class Level(object):
         self.boxes[box].remove_entry(e_id)
 
     # If too unbalanced, rebalances boxes to be more even.
-    def rebalance():
+    # TODO: Implement
+    def rebalance(self):
         return
 
 # A Leitner level representing the final level.
@@ -98,7 +111,7 @@ class FinishedLevel(object):
         self.boxes[0].remove_entry(e_id)
 
     # If too unbalanced, rebalances boxes to be more even.
-    def rebalance():
+    def rebalance(self):
         return
 
 # One set of Leitner Boxes, with all levels.
