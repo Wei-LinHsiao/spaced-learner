@@ -37,33 +37,7 @@ class LeitnerBoxesBoxCases(unittest.TestCase):
         self.box.add_entry(self.entry_2)
         all = self.box.get_all_entries()
 
-        self.assertEqual(len(all), 2)
-
-
-class LeitnerBoxesBoxCases(unittest.TestCase):
-    def setUp(self):
-        self.entry_1 = leitner_boxes.Entry(0, 0, "", "")
-        self.entry_2 = leitner_boxes.Entry(0, 1, "", "")
-        self.entry_3 = leitner_boxes.Entry(0, 2, "", "")
-
-        self.box = leitner_boxes.Box(0, 0)
-
-    def test_box_entry_add(self):
-        self.box.add_entry(self.entry_1)
-        self.box.add_entry(self.entry_1)
-        self.assertEqual(self.box.get_size(), 1, "Box is not of expected size")
-
-    def test_box_entry_remove(self):
-        self.box.add_entry(self.entry_1)
-        self.box.add_entry(self.entry_2)
-        self.box.remove_entry(self.entry_1)
-        self.assertEqual(self.box.get_size(), 1, "Box is not of expected size")
-
-    def test_box_get_all(self):
-        self.box.add_entry(self.entry_1)
-        self.box.add_entry(self.entry_2)
-        all = self.box.get_all_entries()
-
+        self.assertEqual(type(all[0]), type(self.entry_1))
         self.assertEqual(len(all), 2)
 
 class LeitnerBoxesLevelCases(unittest.TestCase):
@@ -114,7 +88,12 @@ class LeitnerBoxesLevelCases(unittest.TestCase):
 
         all = list(self.level.get_all_entries())
 
+        # Ensure Length is correct, all elements are in.
         self.assertEqual(len(all), 3)
+
+        # Ensure type is correct, all elements are entries.
+        for i in all:
+            self.assertEqual(type(i), type(self.entry_1))
 
 class LeitnerBoxesDeckCases(unittest.TestCase):
     def setUp(self):
@@ -183,18 +162,48 @@ class LeitnerBoxesDeckCases(unittest.TestCase):
             self.deck.upgrade_entry(entry_1)
 
     def test_deck_get_all(self):
-        for i in range(0, 99):
+        for i in range(0, 100):
             entry = self.deck.create_entry("", "")
 
-            if i % 2 == 0 or i % 3 == 0 or\
-                    i % 5 == 0 or i % 7 == 0:
+            if i % 2 == 0:
+                self.deck.upgrade_entry(entry)
+            if i % 3 == 0:
+                self.deck.upgrade_entry(entry)
+            if i % 5 == 0:
+                self.deck.upgrade_entry(entry)
+            if i % 7 == 0:
                 self.deck.upgrade_entry(entry)
 
             self.deck.cur_day += 1
 
-        print(len(list(self.deck.get_all_cards())))
+        all = self.deck.get_all_cards()
+        self.assertEqual(len(all), 100)
 
+        # Check if types are equal.
+        for i in all:
+            self.assertEqual(type(i), type(self.entry_1))
 
+    # Tests of get_current gets a list of entries.
+    def test_deck_get_current(self):
+        for i in range(0, 100):
+            entry = self.deck.create_entry("", "")
+
+            if i % 2 == 0:
+                self.deck.upgrade_entry(entry)
+            if i % 3 == 0:
+                self.deck.upgrade_entry(entry)
+            if i % 5 == 0:
+                self.deck.upgrade_entry(entry)
+            if i % 7 == 0:
+                self.deck.upgrade_entry(entry)
+
+            self.deck.cur_day += 1
+
+        all = self.deck.get_current_cards()
+
+        # Ensures that typing is correct.
+        for i in all:
+            self.assertEqual(type(i), type(self.entry_1))
 
 if __name__ == '__main__':
     unittest.main()

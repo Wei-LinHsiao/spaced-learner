@@ -1,4 +1,4 @@
-import itertools
+from functools import reduce
 
 # TODO: Add functions to change values in server.
 class Entry:
@@ -83,7 +83,7 @@ class Level(object):
 
     # Returns an iterable (to avoid copying lists) of all entries.
     def get_all_entries(self):
-        return itertools.product(map(lambda x: x.get_all_entries(), self.boxes))
+        return reduce(list.__add__, map(lambda x: x.get_all_entries(), self.boxes))
 
     # Adds an entry to a box.
     def add_entry(self, box, entry):
@@ -91,7 +91,7 @@ class Level(object):
 
     # Adds an entry to a level in a balanced manner.
     def add_entry_balanced(self, entry):
-        min_box = min(self.boxes, key = lambda x: x.get_size())
+        min_box = min(self.boxes, key=lambda x: x.get_size())
         min_box.add_entry(entry)
 
     # Removes an entry in a certain box with a given e_id.
@@ -122,7 +122,7 @@ class FinishedLevel(object):
         return self.boxes[0].get_size()
 
     def get_all_entries(self):
-        itertools.product(self.boxes)
+        return reduce(list.__add__, map(lambda x: x.get_all_entries(), self.boxes))
 
     # Adds an entry to a box.
     def add_entry(self, box, entry):
@@ -159,11 +159,6 @@ class BoxSet(object):
             Level(4, 14),
             FinishedLevel(5)
         ]
-
-        level_idx = 0
-        for level in self.levels:
-            level.leve_idx = level_idx
-            level_idx += 1
 
         self.num_levels = len(self.levels) - 1
 
@@ -222,8 +217,12 @@ class BoxSet(object):
 
     def get_all_cards(self):
         # Return all entries in all levels in an iterable.
-        return
+        # We cannot use map; improper iterables.
+        return reduce(list.__add__, map(lambda x: x.get_all_entries(), self.levels))
 
-    def get_tested_cards(self):
+    def get_current_cards(self):
         # Get all cards tested in this day.
-        return
+        # Functional: Gets box indes that corresponds to the correct day, and gets all entries.
+        return reduce(list.__add__, map(lambda i: self.levels[i]
+                   .boxes[self.cur_day % self.levels[i].interval]
+                   .get_all_entries(), range(0, 5)))
