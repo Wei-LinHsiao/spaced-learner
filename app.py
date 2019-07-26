@@ -17,6 +17,7 @@ if debug:
     current_box.create_entry("Six", "")
     current_box.create_entry("Seven", "")
 
+# General Functions
 # Updates all entries, given the status of their info.
 def start_day():
     ## This code is at the start of a "day"; sort and figure things out
@@ -37,41 +38,49 @@ def start_day():
 
     # Advance the day.
     current_box.cur_day += 1
-# General Functions
+
+## Rotue Functions: API
+
+# Updates a given entry, given an e_id and button color.
+@app.route('/api/entry/status-update', methods=["POST"])
+def api_entry_status_update():
+    if request.method == "POST":
+        # Get color, and modify accordingly
+        id = int(request.json["e_id"])
+        entry = current_box.get_entry(id)
+        color = request.json["color"]
+
+        # # Update color and status values
+        # # Don't change priority if status is not 1
+        # # Return value to normal if status is already that color
+        cur_status = entry.status
+        if color == "red":
+            if cur_status != 2:
+                entry.status = 2
+            else:
+                entry.status = 1
+        if color == "grey":
+            if cur_status != 3:
+                entry.status = 3
+            else:
+                entry.status = 1
+        if color == "green":
+            if cur_status != 4:
+                entry.status = 4
+            else:
+                entry.status = 1
+
+    return ""
+
 
 ## Route Functions: Render main pages.
+
+# Main page for tester.
 @app.route('/tester', methods=["GET", "POST"])
 def tester():
     if request.method == "POST":
         # If is submit, next day and end.
-        if "submit" in request.form:
-            start_day()
-        else:
-            print(request.json)
-            # Get color, and modify accordingly
-            id = int(request.json["e_id"])
-            entry = current_box.get_entry(id)
-            color = request.json["color"]
-
-            # # Update color and status values
-            # # Don't change priority if status is not 1
-            # # Return value to normal if status is already that color
-            cur_status = entry.status
-            if color == "red":
-                if cur_status != 2:
-                    entry.status = 2
-                else:
-                    entry.status = 1
-            if color == "grey":
-                if cur_status != 3:
-                    entry.status = 3
-                else:
-                    entry.status = 1
-            if color == "green":
-                if cur_status != 4:
-                    entry.status = 4
-                else:
-                    entry.status = 1
+        start_day()
 
     return render_template('tester.html', entries = current_box.get_current_cards())
 
