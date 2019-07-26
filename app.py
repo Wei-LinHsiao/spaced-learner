@@ -1,7 +1,14 @@
-from flask import Flask, render_template, request
+# Flask Imports
+from flask import Flask, render_template, request, flash, redirect
+from config import Config
+from forms import LoginForm
+
+
+# Importing internal classes
 import leitner_boxes
 
 app = Flask(__name__)
+app.config.from_object(Config)
 
 # Global variables.
 current_box = leitner_boxes.BoxSet(0)
@@ -74,9 +81,8 @@ def api_entry_status_update():
 
     return ""
 
-
 ## Route Functions: Render main pages.
-# Main page for tester.
+
 @app.route('/tester', methods=["GET", "POST"])
 def tester():
     if request.method == "POST":
@@ -86,6 +92,16 @@ def tester():
             start_day()
 
     return render_template('tester.html', entries = current_box.get_current_cards())
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+    if form.validate_on_submit():
+        flash('Login requested for user {}, remember_me={}'.format(
+            form.username.data, form.remember_me.data))
+        return redirect('/index')
+    return render_template('login.html', title='Sign In', form=form)
+
 
 # Run this code before Flask starts
 start_day()

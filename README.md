@@ -15,6 +15,10 @@ Milestone One: Get basic app working for one user
 Milestone Two: Get Basic Login, DB capabilites
  - Add login, authentication, and multiple users
  - Save information about entries into database, and pull when needed
+ - Refractor html; add basic template/ navbar for all pages
+    - Switch from linking to pages to url_for's
+ - Create user "hub" page
+
 
 Milestone Three: Expand basic app for multiple users
  - Create page to create new entries

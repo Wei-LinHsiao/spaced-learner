@@ -1,6 +1,7 @@
 import unittest
 # import app
-import leitner_boxes
+from app import leitner_boxes
+
 
 class FlaskAppCases(unittest.TestCase):
 
