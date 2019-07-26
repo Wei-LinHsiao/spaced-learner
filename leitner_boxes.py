@@ -160,6 +160,8 @@ class BoxSet(object):
             FinishedLevel(5)
         ]
 
+        self.entries = {}
+
         self.num_levels = len(self.levels) - 1
 
     def __str__(self):
@@ -173,7 +175,12 @@ class BoxSet(object):
         new_entry = Entry(self.u_id, self.next_eid, front_text, back_text, self)
         self.next_eid += 1
         self.add_entry(0, 0, new_entry)
+        self.entries[new_entry.e_id] = new_entry
         return new_entry
+
+    # Gets an entry by its e_id.
+    def get_entry(self, e_id):
+        return self.entries[e_id]
 
     # Adds entry to a given level and box.
     def add_entry(self, level, box, entry):
@@ -211,6 +218,22 @@ class BoxSet(object):
             raise AssertionError("Entry " + str(entry.e_id) + " is already archived.")
         else:
             raise AssertionError("Entry " + str(entry.e_id) + " has an invalid level.")
+
+    def downgrade_entry(self, entry):
+        # If it is in 0, do nothing.
+        if entry.level == 0:
+            return
+        # Remove from current level.
+        self.remove_entry(entry)
+        if entry.level in range(1, 5):
+            # Move down to level 0.
+            self.levels[0].add_entry_balanced(entry)
+        elif entry.level == 5:
+            # Move entry to finished box.
+            raise AssertionError("Entry " + str(entry.e_id) + " is already archived.")
+        else:
+            raise AssertionError("Entry " + str(entry.e_id) + " has an invalid level.")
+
 
     def get_size(self):
         return sum(list(map(lambda x: x.get_size(), self.levels)))

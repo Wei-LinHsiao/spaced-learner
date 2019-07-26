@@ -1,6 +1,5 @@
 import unittest
-
-import app
+# import app
 import leitner_boxes
 
 class FlaskAppCases(unittest.TestCase):
@@ -118,6 +117,13 @@ class LeitnerBoxesDeckCases(unittest.TestCase):
         self.deck.remove_entry(entry_1)
         self.assertTrue(self.deck.get_size() == 1)
 
+    def test_deck_get_entry(self):
+        for i in range(0, 10):
+            self.deck.create_entry("", "")
+
+        for i in range(0, 10):
+            self.assertEqual(self.deck.get_entry(i).e_id, i)
+
     def test_deck_upgrade_one(self):
         # Upgrade the deck; ensure it is in deck two.
         entry_1 = self.deck.create_entry("", "")
@@ -160,6 +166,25 @@ class LeitnerBoxesDeckCases(unittest.TestCase):
 
         with self.assertRaises(Exception):
             self.deck.upgrade_entry(entry_1)
+
+    def test_deck_downgrade_one(self):
+        # Upgrade the deck; ensure it is in deck two.
+        entry_1 = self.deck.create_entry("", "")
+        entry_2 = self.deck.create_entry("", "")
+        self.deck.create_entry("", "")
+        self.deck.create_entry("", "")
+        self.deck.upgrade_entry(entry_1)
+        self.deck.upgrade_entry(entry_2)
+        self.deck.upgrade_entry(entry_2)
+        self.deck.upgrade_entry(entry_2)
+
+        # Ensure that downgrading results it in going to 0.
+        self.deck.downgrade_entry(entry_1)
+        self.deck.downgrade_entry(entry_2)
+        print(self.deck)
+        self.assertTrue(self.deck.levels[0].get_size() == 4)
+        self.assertTrue(self.deck.levels[1].get_size() == 0)
+
 
     def test_deck_get_all(self):
         for i in range(0, 100):
