@@ -50,6 +50,8 @@ def api_entry_status_update():
         entry = current_box.get_entry(id)
         color = request.json["color"]
 
+        print(request.json)
+
         # # Update color and status values
         # # Don't change priority if status is not 1
         # # Return value to normal if status is already that color
@@ -74,13 +76,14 @@ def api_entry_status_update():
 
 
 ## Route Functions: Render main pages.
-
 # Main page for tester.
 @app.route('/tester', methods=["GET", "POST"])
 def tester():
     if request.method == "POST":
-        # If is submit, next day and end.
-        start_day()
+        if "submit" in request.form:
+            print(current_box)
+            # If is submit, next day and end.
+            start_day()
 
     return render_template('tester.html', entries = current_box.get_current_cards())
 
