@@ -27,4 +27,5 @@ Milestone Three: Expand basic app for multiple users
  
 Milestone Four: Facelift
  - No specifics, but reform interface frontend
+ - Add importing of flashcards from CSV
  
