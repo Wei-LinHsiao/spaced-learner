@@ -41,7 +41,6 @@ def start_day():
 
 ## Route Functions: Render main pages.
 @app.route('/tester', methods=["GET", "POST"])
-@app.route('/', methods=["GET", "POST"])
 def tester():
     if request.method == "POST":
         # If is submit, next day and end.
