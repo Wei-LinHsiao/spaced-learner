@@ -146,7 +146,6 @@ class BoxSet(object):
     # Hardcode the progression; 1, 2, 5, 8, 14, NONE.
     def __init__(self, u_id):
         self.u_id = u_id
-        # TODO: Implement changing of BoxID with multiple decks.
         self.deck_id = 0
         self.cur_day = 0
         self.next_eid = 0
@@ -177,6 +176,10 @@ class BoxSet(object):
         self.next_eid += 1
         self.add_entry(0, 0, new_entry)
         self.entries[new_entry.e_id] = new_entry
+
+        # Add entry to the database.
+
+
         return new_entry
 
     # Gets an entry by its e_id.
@@ -234,7 +237,6 @@ class BoxSet(object):
             raise AssertionError("Entry " + str(entry.e_id) + " is already archived.")
         else:
             raise AssertionError("Entry " + str(entry.e_id) + " has an invalid level.")
-
 
     def get_size(self):
         return sum(list(map(lambda x: x.get_size(), self.levels)))

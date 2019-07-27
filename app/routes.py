@@ -1,18 +1,7 @@
-# Flask Imports
-from flask import Flask, render_template, request, flash, redirect
-from config import Config
-from forms import LoginForm
-from flask_sqlalchemy import SQLAlchemy
+from flask import render_template, request, flash, redirect
+from app import app, leitner_boxes
+from app.forms import LoginForm
 
-# Importing internal classes
-import leitner_boxes
-
-app = Flask(__name__)
-app.config.from_object(Config)
-db = SQLAlchemy(app)
-
-# Circular Dependency
-from models import User, Deck, Entry
 
 # Global variables.
 # Cache of decks.
@@ -108,9 +97,3 @@ def login():
             form.username.data, form.remember_me.data))
         return redirect('/index')
     return render_template('login.html', title='Sign In', form=form)
-
-# Run this code before Flask starts
-start_day()
-
-if __name__ == '__main__':
-    app.run()
