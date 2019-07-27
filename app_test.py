@@ -1,5 +1,5 @@
 import unittest
-# import app
+import app
 from app import leitner_boxes
 
 
@@ -10,14 +10,14 @@ class FlaskAppCases(unittest.TestCase):
         Tests if flask is running and set up correctly.
         """
         tester = app.app.test_client(self)
-        response = tester.get('/', content_type='html/text')
+        response = tester.get('/index', content_type='html/text')
         self.assertEqual(response.status_code, 200)
 
 class LeitnerBoxesBoxCases(unittest.TestCase):
     def setUp(self):
-        self.entry_1 = leitner_boxes.Entry(0, 0, "", "")
-        self.entry_2 = leitner_boxes.Entry(0, 1, "", "")
-        self.entry_3 = leitner_boxes.Entry(0, 2, "", "")
+        self.entry_1 = leitner_boxes.Entry(0, 0, 1, "", "")
+        self.entry_2 = leitner_boxes.Entry(0, 0, 2, "", "")
+        self.entry_3 = leitner_boxes.Entry(0, 0, 3, "", "")
 
         self.box = leitner_boxes.Box(0, 0)
 
@@ -36,15 +36,14 @@ class LeitnerBoxesBoxCases(unittest.TestCase):
         self.box.add_entry(self.entry_1)
         self.box.add_entry(self.entry_2)
         all = self.box.get_all_entries()
-
         self.assertEqual(type(all[0]), type(self.entry_1))
-        self.assertEqual(len(all), 2)
+        self.assertEqual(2, len(all))
 
 class LeitnerBoxesLevelCases(unittest.TestCase):
     def setUp(self):
-        self.entry_1 = leitner_boxes.Entry(0, 0, "", "")
-        self.entry_2 = leitner_boxes.Entry(0, 1, "", "")
-        self.entry_3 = leitner_boxes.Entry(0, 2, "", "")
+        self.entry_1 = leitner_boxes.Entry(0, 0, 1, "", "")
+        self.entry_2 = leitner_boxes.Entry(0, 0, 2,"", "")
+        self.entry_3 = leitner_boxes.Entry(0, 0, 3, "", "")
 
         self.box = leitner_boxes.Box(0, 0)
         self.level = leitner_boxes.Level(0, 3)
@@ -97,9 +96,9 @@ class LeitnerBoxesLevelCases(unittest.TestCase):
 
 class LeitnerBoxesDeckCases(unittest.TestCase):
     def setUp(self):
-        self.entry_1 = leitner_boxes.Entry(0, 0, "", "")
-        self.entry_2 = leitner_boxes.Entry(0, 1, "", "")
-        self.entry_3 = leitner_boxes.Entry(0, 2, "", "")
+        self.entry_1 = leitner_boxes.Entry(0, 0, 1, "", "")
+        self.entry_2 = leitner_boxes.Entry(0, 0, 2,"", "")
+        self.entry_3 = leitner_boxes.Entry(0, 0, 3, "", "")
 
         self.box = leitner_boxes.Box(0, 0)
         self.level = leitner_boxes.Level(0, 3)
@@ -182,7 +181,6 @@ class LeitnerBoxesDeckCases(unittest.TestCase):
         # Ensure that downgrading results it in going to 0.
         self.deck.downgrade_entry(entry_1)
         self.deck.downgrade_entry(entry_2)
-        print(self.deck)
         self.assertTrue(self.deck.levels[0].get_size() == 4)
         self.assertTrue(self.deck.levels[1].get_size() == 0)
 
@@ -230,6 +228,14 @@ class LeitnerBoxesDeckCases(unittest.TestCase):
         # Ensures that typing is correct.
         for i in all:
             self.assertEqual(type(i), type(self.entry_1))
+
+class DBTesting(unittest.TestCase):
+
+    def test_entry_creation_in_db(self):
+        return
+
+    def test_write_deck_and_back(self):
+        return
 
 if __name__ == '__main__':
     unittest.main()

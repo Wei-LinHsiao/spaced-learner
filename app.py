@@ -15,6 +15,8 @@ db = SQLAlchemy(app)
 from models import User, Deck, Entry
 
 # Global variables.
+# Cache of decks.
+deck_cache = {}
 current_box = leitner_boxes.BoxSet(0)
 debug = True
 

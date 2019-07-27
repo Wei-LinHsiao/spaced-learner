@@ -2,7 +2,7 @@ from functools import reduce
 
 # TODO: Add functions to change values in server.
 class Entry:
-    def __init__(self, u_id, e_id, front_text, back_text, deck = None):
+    def __init__(self, u_id, deck_id, e_id, front_text, back_text):
         # All Entries have the following properties:
             # u_id - user id
             # e_id - entry id
@@ -20,7 +20,7 @@ class Entry:
         self.front_text = front_text
         self.back_text = back_text
         # Should this be the deckID?
-        self.deck = deck
+        self.deck_id = deck_id
         self.status = 0
         self.level = 0
         self.box = 0
@@ -147,7 +147,7 @@ class BoxSet(object):
     def __init__(self, u_id):
         self.u_id = u_id
         # TODO: Implement changing of BoxID with multiple decks.
-        self.box_id = 0
+        self.deck_id = 0
         self.cur_day = 0
         self.next_eid = 0
 
@@ -166,14 +166,14 @@ class BoxSet(object):
         self.num_levels = len(self.levels) - 1
 
     def __str__(self):
-        deck_str = "Deck id " + str(self.box_id) + ":"
+        deck_str = "Deck id " + str(self.deck_id) + ":"
         level_str = "\n  ".join(map(lambda x: str(x).replace("  ", "    "), self.levels))
 
         return("\n  ".join([deck_str, level_str]))
 
     # Creates a new entry, and puts it in the first Leitner box
     def create_entry(self, front_text, back_text):
-        new_entry = Entry(self.u_id, self.next_eid, front_text, back_text, self)
+        new_entry = Entry(self.u_id, self.deck_id, self.next_eid, front_text, back_text)
         self.next_eid += 1
         self.add_entry(0, 0, new_entry)
         self.entries[new_entry.e_id] = new_entry
