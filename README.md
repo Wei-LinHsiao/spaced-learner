@@ -5,6 +5,7 @@ A spaced learning web app, based on the Leitner system of flashcards.
 Deployment
  - Flask
  - Flask-WTF
+ - Flask-SQLAlchemy
 
 Implementation Timeline:
 Milestone One: Get basic app working for one user

@@ -2,13 +2,17 @@
 from flask import Flask, render_template, request, flash, redirect
 from config import Config
 from forms import LoginForm
-
+from flask_sqlalchemy import SQLAlchemy
 
 # Importing internal classes
 import leitner_boxes
 
 app = Flask(__name__)
 app.config.from_object(Config)
+db = SQLAlchemy(app)
+
+# Circular Dependency
+from models import User, Deck, Entry
 
 # Global variables.
 current_box = leitner_boxes.BoxSet(0)
@@ -84,6 +88,7 @@ def api_entry_status_update():
 ## Route Functions: Render main pages.
 
 @app.route('/tester', methods=["GET", "POST"])
+@app.route('/index', methods=["GET", "POST"])
 def tester():
     if request.method == "POST":
         if "submit" in request.form:
@@ -101,7 +106,6 @@ def login():
             form.username.data, form.remember_me.data))
         return redirect('/index')
     return render_template('login.html', title='Sign In', form=form)
-
 
 # Run this code before Flask starts
 start_day()

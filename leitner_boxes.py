@@ -2,7 +2,7 @@ from functools import reduce
 
 # TODO: Add functions to change values in server.
 class Entry:
-    def __init__(self, u_id, e_id, front_text, back_text, box_set = None):
+    def __init__(self, u_id, e_id, front_text, back_text, deck = None):
         # All Entries have the following properties:
             # u_id - user id
             # e_id - entry id
@@ -19,7 +19,8 @@ class Entry:
         self.e_id = e_id
         self.front_text = front_text
         self.back_text = back_text
-        self.box_set = box_set
+        # Should this be the deckID?
+        self.deck = deck
         self.status = 0
         self.level = 0
         self.box = 0
