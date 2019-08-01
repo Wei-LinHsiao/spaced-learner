@@ -1,6 +1,5 @@
 import unittest
-import app
-from app import leitner_boxes
+from app import leitner_boxes, app, db
 
 
 class FlaskAppCases(unittest.TestCase):
@@ -9,7 +8,7 @@ class FlaskAppCases(unittest.TestCase):
         """
         Tests if flask is running and set up correctly.
         """
-        tester = app.app.test_client(self)
+        tester = app.test_client(self)
         response = tester.get('/index', content_type='html/text')
         self.assertEqual(response.status_code, 200)
 
@@ -230,6 +229,13 @@ class LeitnerBoxesDeckCases(unittest.TestCase):
             self.assertEqual(type(i), type(self.entry_1))
 
 class DBTesting(unittest.TestCase):
+    def setUp(self):
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
+        db.create_all()
+
+    def tearDown(self):
+        db.session.remove()
+        db.drop_all()
 
     def test_entry_creation_in_db(self):
         return

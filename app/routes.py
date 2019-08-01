@@ -2,10 +2,8 @@ from flask import render_template, request, flash, redirect
 from app import app, leitner_boxes
 from app.forms import LoginForm
 
-
 # Global variables.
 # Cache of decks.
-deck_cache = {}
 current_box = leitner_boxes.BoxSet(0)
 debug = True
 
