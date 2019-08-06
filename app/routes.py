@@ -1,21 +1,7 @@
 from flask import render_template, request, flash, redirect
-from app import app, leitner_boxes
+from app import app
+from app import current_box
 from app.forms import LoginForm
-
-# Global variables.
-# Cache of decks.
-current_box = leitner_boxes.BoxSet(0)
-debug = True
-
-# Mock db of all entires; list for now.
-if debug:
-    current_box.create_entry("One", "")
-    current_box.create_entry("Two", "")
-    current_box.create_entry("Three", "")
-    current_box.create_entry("Four", "")
-    current_box.create_entry("Five", "")
-    current_box.create_entry("Six", "")
-    current_box.create_entry("Seven", "")
 
 # General Functions
 # Updates all entries, given the status of their info.

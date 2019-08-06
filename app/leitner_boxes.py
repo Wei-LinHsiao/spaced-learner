@@ -1,4 +1,7 @@
 from functools import reduce
+from app import db
+from app.models import Deck as DBDeck
+from app.models import Entry as DBEntry
 
 # TODO: Add functions to change values in server.
 class Entry:
@@ -144,11 +147,13 @@ class FinishedLevel(object):
 # One set of Leitner Boxes, with all levels.
 class BoxSet(object):
     # Hardcode the progression; 1, 2, 5, 8, 14, NONE.
-    def __init__(self, u_id):
+    def __init__(self, u_id, name = "Untitled Box"):
+        self.box_id = None
         self.u_id = u_id
         self.deck_id = 0
         self.cur_day = 0
         self.next_eid = 0
+        self.name = name
 
         # Initiate a number of boxes, relative to level value.
         self.levels = [
@@ -161,8 +166,16 @@ class BoxSet(object):
         ]
 
         self.entries = {}
-
         self.num_levels = len(self.levels) - 1
+
+        # Add a box to the DB.
+        db_deck = DBDeck(u_id = self.u_id, name = self.name)
+        db.session.add(db_deck)
+        db.session.commit()
+
+        # Set the current deck_id. Deck_id's are unique.
+        db.session.flush()
+        self.deck_id = db_deck.id
 
     def __str__(self):
         deck_str = "Deck id " + str(self.deck_id) + ":"
@@ -178,6 +191,7 @@ class BoxSet(object):
         self.entries[new_entry.e_id] = new_entry
 
         # Add entry to the database.
+
 
 
         return new_entry

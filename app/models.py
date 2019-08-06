@@ -11,9 +11,11 @@ class User(db.Model):
         return "User ID" + self.u_id
 
 class Deck(db.Model):
+    __tablename__ = "deck"
+
     id = db.Column(db.Integer, primary_key=True)
     u_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    name = db.Column(db.String(64), index=True, unique=True)
+    name = db.Column(db.String(64), index=True)
     entries = db.relationship('Entry', backref='author', lazy='dynamic')
 
     def __repr__(self):

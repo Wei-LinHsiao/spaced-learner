@@ -1,6 +1,10 @@
 import unittest
 from app import leitner_boxes, app, db
 
+# DB Imports
+from app.models import Deck as DBDeck
+from app.models import Entry as DBEntry
+
 
 class FlaskAppCases(unittest.TestCase):
 
@@ -95,6 +99,11 @@ class LeitnerBoxesLevelCases(unittest.TestCase):
 
 class LeitnerBoxesDeckCases(unittest.TestCase):
     def setUp(self):
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
+        db.create_all()
+        db.session.query(DBDeck).delete()
+        db.session.commit()
+
         self.entry_1 = leitner_boxes.Entry(0, 0, 1, "", "")
         self.entry_2 = leitner_boxes.Entry(0, 0, 2,"", "")
         self.entry_3 = leitner_boxes.Entry(0, 0, 3, "", "")
@@ -102,6 +111,10 @@ class LeitnerBoxesDeckCases(unittest.TestCase):
         self.box = leitner_boxes.Box(0, 0)
         self.level = leitner_boxes.Level(0, 3)
         self.deck = leitner_boxes.BoxSet(0)
+    
+    def tearDown(self):
+        db.session.remove()
+        db.drop_all()
 
     def test_deck_create_entry(self):
         self.deck.create_entry("", "")
@@ -232,12 +245,34 @@ class DBTesting(unittest.TestCase):
     def setUp(self):
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
         db.create_all()
+        db.session.query(DBDeck).delete()
+        db.session.commit()
 
     def tearDown(self):
         db.session.remove()
         db.drop_all()
 
-    def test_entry_creation_in_db(self):
+    def test_deck_creation_db(self):
+        # Ensure that table is initally empty.
+        rows = db.session.query(DBDeck).count()
+        self.assertEqual(rows, 0)
+
+        # After creating a box, an entry is created.
+        box_1 = leitner_boxes.BoxSet(0, "testName")
+        rows = db.session.query(DBDeck).count()
+        self.assertEqual(rows, 1)
+
+        # Assure that the data is correct.
+        first = db.session.query(DBDeck).first()
+        self.assertEqual(first.u_id, 0)
+        self.assertEqual(first.name, "testName")
+
+        # Assure that there are proper unique ids.
+        box_2 = leitner_boxes.BoxSet(0, "testName")
+        self.assertEqual(box_1.deck_id, 1)
+        self.assertEqual(box_2.deck_id, 2)
+
+    def test_entry_creation_db(self):
         return
 
     def test_write_deck_and_back(self):
