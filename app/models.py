@@ -24,9 +24,8 @@ class Deck(db.Model):
 class Entry(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     # Do we need the u_id if we have the deck_id?
-    u_id = db.Column(db.Integer, index = True)
+    u_id = db.Column(db.Integer, index=True)
     deck_id = db.Column(db.Integer, db.ForeignKey('deck.id'))
-    e_id = db.Column(db.Integer, index = True)
     box = db.Column(db.Integer)
     level = db.Column(db.Integer)
     front_text = db.Column(db.Text)

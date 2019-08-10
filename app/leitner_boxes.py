@@ -5,7 +5,7 @@ from app.models import Entry as DBEntry
 
 # TODO: Add functions to change values in server.
 class Entry:
-    def __init__(self, u_id, deck_id, e_id, front_text, back_text):
+    def __init__(self, u_id, deck_id, front_text, back_text, push_db=True):
         # All Entries have the following properties:
             # u_id - user id
             # e_id - entry id
@@ -18,19 +18,35 @@ class Entry:
                 # 3 - Selected, grey
                 # 4 - Selected, green
             # level, box - Leitner method boxes.
+        self.id = None
         self.u_id = u_id
-        self.e_id = e_id
-        self.front_text = front_text
-        self.back_text = back_text
         # Should this be the deckID?
         self.deck_id = deck_id
-        self.status = 0
+        self.front_text = front_text
+        self.back_text = back_text
+        # Changing info
         self.level = 0
         self.box = 0
+        self.status = 0
+
+        if push_db:
+            db_entry = DBEntry(u_id = self.u_id,
+                               deck_id = self.deck_id,
+                               box = self.box,
+                               level = self.level,
+                               front_text = self.front_text,
+                               back_text = self.back_text)
+            db.session.add(db_entry)
+            db.session.commit()
+
+            # Set the current deck_id. Deck_id's are unique.
+            db.session.flush()
+            self.id = db_entry.id
+
 
     # Tostring method; simply return the string's eid. May update.
     def __str__(self):
-        return str(self.e_id)
+        return str(self.id)
 
 # One Leitner flashcard box.
 class Box(object):
@@ -53,17 +69,17 @@ class Box(object):
 
     # Adds entry in box.
     def add_entry(self, entry):
-        self.box[entry.e_id] = entry
+        self.box[entry.id] = entry
         entry.box = self.num
         entry.level = self.level
 
     # Removes entry, by entry_id, if it exists in box.
     def remove_entry(self, entry):
-        if entry.e_id in self.box:
-            del self.box[entry.e_id]
+        if entry.id in self.box:
+            del self.box[entry.id]
         else:
             # Throw error.
-            raise KeyError("No entry with e_id " + str(entry.e_id) +
+            raise KeyError("No entry with e_id " + str(entry.id) +
                            " found in box " + str(self.num) +
                            " at level " + str(self.level))
 
@@ -147,12 +163,11 @@ class FinishedLevel(object):
 # One set of Leitner Boxes, with all levels.
 class BoxSet(object):
     # Hardcode the progression; 1, 2, 5, 8, 14, NONE.
-    def __init__(self, u_id, name = "Untitled Box"):
-        self.box_id = None
+    def __init__(self, u_id, name = "Untitled Box", push_db = True):
+        # Unique identifier for deck.
+        self.deck_id = None
         self.u_id = u_id
-        self.deck_id = 0
         self.cur_day = 0
-        self.next_eid = 0
         self.name = name
 
         # Initiate a number of boxes, relative to level value.
@@ -169,13 +184,14 @@ class BoxSet(object):
         self.num_levels = len(self.levels) - 1
 
         # Add a box to the DB.
-        db_deck = DBDeck(u_id = self.u_id, name = self.name)
-        db.session.add(db_deck)
-        db.session.commit()
+        if push_db:
+            db_deck = DBDeck(u_id = self.u_id, name = self.name)
+            db.session.add(db_deck)
+            db.session.commit()
 
-        # Set the current deck_id. Deck_id's are unique.
-        db.session.flush()
-        self.deck_id = db_deck.id
+            # Set the current deck_id. Deck_id's are unique.
+            db.session.flush()
+            self.deck_id = db_deck.id
 
     def __str__(self):
         deck_str = "Deck id " + str(self.deck_id) + ":"
@@ -185,20 +201,14 @@ class BoxSet(object):
 
     # Creates a new entry, and puts it in the first Leitner box
     def create_entry(self, front_text, back_text):
-        new_entry = Entry(self.u_id, self.deck_id, self.next_eid, front_text, back_text)
-        self.next_eid += 1
+        new_entry = Entry(self.u_id, self.deck_id, front_text, back_text)
         self.add_entry(0, 0, new_entry)
-        self.entries[new_entry.e_id] = new_entry
-
-        # Add entry to the database.
-
-
-
+        self.entries[new_entry.id] = new_entry
         return new_entry
 
     # Gets an entry by its e_id.
-    def get_entry(self, e_id):
-        return self.entries[e_id]
+    def get_entry(self, id):
+        return self.entries[id]
 
     # Adds entry to a given level and box.
     def add_entry(self, level, box, entry):
@@ -233,9 +243,9 @@ class BoxSet(object):
             self.levels[5].add_entry(0, entry)
         elif entry.level == 5:
             # Move entry to finished box.
-            raise AssertionError("Entry " + str(entry.e_id) + " is already archived.")
+            raise AssertionError("Entry " + str(entry.id) + " is already archived.")
         else:
-            raise AssertionError("Entry " + str(entry.e_id) + " has an invalid level.")
+            raise AssertionError("Entry " + str(entry.id) + " has an invalid level.")
 
     def downgrade_entry(self, entry):
         # If it is in 0, do nothing.
@@ -248,9 +258,9 @@ class BoxSet(object):
             self.levels[0].add_entry_balanced(entry)
         elif entry.level == 5:
             # Move entry to finished box.
-            raise AssertionError("Entry " + str(entry.e_id) + " is already archived.")
+            raise AssertionError("Entry " + str(entry.id) + " is already archived.")
         else:
-            raise AssertionError("Entry " + str(entry.e_id) + " has an invalid level.")
+            raise AssertionError("Entry " + str(entry.id) + " has an invalid level.")
 
     def get_size(self):
         return sum(list(map(lambda x: x.get_size(), self.levels)))

@@ -18,11 +18,21 @@ class FlaskAppCases(unittest.TestCase):
 
 class LeitnerBoxesBoxCases(unittest.TestCase):
     def setUp(self):
-        self.entry_1 = leitner_boxes.Entry(0, 0, 1, "", "")
-        self.entry_2 = leitner_boxes.Entry(0, 0, 2, "", "")
-        self.entry_3 = leitner_boxes.Entry(0, 0, 3, "", "")
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
+        db.create_all()
+        db.session.query(DBDeck).delete()
+        db.session.query(DBEntry).delete()
+        db.session.commit()
+
+        self.entry_1 = leitner_boxes.Entry(0, 0, "", "")
+        self.entry_2 = leitner_boxes.Entry(0, 0, "", "")
+        self.entry_3 = leitner_boxes.Entry(0, 0, "", "")
 
         self.box = leitner_boxes.Box(0, 0)
+
+    def tearDown(self):
+        db.session.remove()
+        db.drop_all()
 
     def test_box_entry_add(self):
         self.box.add_entry(self.entry_1)
@@ -44,12 +54,22 @@ class LeitnerBoxesBoxCases(unittest.TestCase):
 
 class LeitnerBoxesLevelCases(unittest.TestCase):
     def setUp(self):
-        self.entry_1 = leitner_boxes.Entry(0, 0, 1, "", "")
-        self.entry_2 = leitner_boxes.Entry(0, 0, 2,"", "")
-        self.entry_3 = leitner_boxes.Entry(0, 0, 3, "", "")
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
+        db.create_all()
+        db.session.query(DBDeck).delete()
+        db.session.query(DBEntry).delete()
+        db.session.commit()
+
+        self.entry_1 = leitner_boxes.Entry(0, 0, "", "")
+        self.entry_2 = leitner_boxes.Entry(0, 0, "", "")
+        self.entry_3 = leitner_boxes.Entry(0, 0, "", "")
 
         self.box = leitner_boxes.Box(0, 0)
         self.level = leitner_boxes.Level(0, 3)
+
+    def tearDown(self):
+        db.session.remove()
+        db.drop_all()
 
     def test_level_add(self):
         self.level.add_entry(0, self.entry_1)
@@ -102,16 +122,17 @@ class LeitnerBoxesDeckCases(unittest.TestCase):
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
         db.create_all()
         db.session.query(DBDeck).delete()
+        db.session.query(DBEntry).delete()
         db.session.commit()
 
-        self.entry_1 = leitner_boxes.Entry(0, 0, 1, "", "")
-        self.entry_2 = leitner_boxes.Entry(0, 0, 2,"", "")
-        self.entry_3 = leitner_boxes.Entry(0, 0, 3, "", "")
+        self.entry_1 = leitner_boxes.Entry(0, 0, "", "")
+        self.entry_2 = leitner_boxes.Entry(0, 0, "", "")
+        self.entry_3 = leitner_boxes.Entry(0, 0, "", "")
 
         self.box = leitner_boxes.Box(0, 0)
         self.level = leitner_boxes.Level(0, 3)
         self.deck = leitner_boxes.BoxSet(0)
-    
+
     def tearDown(self):
         db.session.remove()
         db.drop_all()
@@ -132,9 +153,9 @@ class LeitnerBoxesDeckCases(unittest.TestCase):
     def test_deck_get_entry(self):
         for i in range(0, 10):
             self.deck.create_entry("", "")
-
-        for i in range(0, 10):
-            self.assertEqual(self.deck.get_entry(i).e_id, i)
+        # Not zero to 10; three entries created already.
+        for i in range(4, 14):
+            self.assertEqual(self.deck.get_entry(i).id, i)
 
     def test_deck_upgrade_one(self):
         # Upgrade the deck; ensure it is in deck two.
@@ -246,6 +267,7 @@ class DBTesting(unittest.TestCase):
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
         db.create_all()
         db.session.query(DBDeck).delete()
+        db.session.query(DBEntry).delete()
         db.session.commit()
 
     def tearDown(self):
