@@ -43,7 +43,6 @@ class Entry:
             db.session.flush()
             self.id = db_entry.id
 
-
     # Tostring method; simply return the string's eid. May update.
     def __str__(self):
         return str(self.id)

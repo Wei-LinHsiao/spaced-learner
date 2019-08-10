@@ -2,10 +2,15 @@
 from flask import Flask
 from config import Config
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager
+
 
 # Configure the app.
 app = Flask(__name__)
 app.config.from_object(Config)
+
+# Set up logins.
+login = LoginManager(app)
 
 # Set up the database.
 db = SQLAlchemy(app)
