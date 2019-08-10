@@ -6,6 +6,7 @@ Deployment
  - Flask
  - Flask-WTF
  - Flask-SQLAlchemy
+ - Flask-Login
 
 Implementation Timeline:
 Milestone One: Get basic app working for one user
