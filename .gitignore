@@ -2,6 +2,9 @@
 # Created by https://www.gitignore.io/api/java,ruby,macos,scala,python,pycharm,rubymine
 # Edit at https://www.gitignore.io/?templates=java,ruby,macos,scala,python,pycharm,rubymine
 
+# Own DB
+app.db
+
 ### Java ###
 # Compiled class file
 *.class
